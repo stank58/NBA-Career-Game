@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>NBA Player Career Game</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+	<h1>NBA Player Career Game</h1>
+	<form id="player-form">
+		<label for="player-name">Enter your name:</label>
+		<input type="text" id="player-name" name="player-name" required>
+		<br>
+		<label for="draft-position">Select your draft position:</label>
+		<select id="draft-position" name="draft-position" required>
+			<option value="1">1st Overall</option>
+			<option value="2">2nd Overall</option>
+			<option value="3">3rd Overall</option>
+			<option value="4">4th Overall</option>
+			<option value="5">5th Overall</option>
+			<option value="6">6th Overall</option>
+			<option value="7">7th Overall</option>
+			<option value="8">8th Overall</option>
+			<option value="9">9th Overall</option>
+			<option value="10">10th Overall</option>
+		</select>
+		<br>
+		<button type="submit">Start Career</button>
+	</form>
+	<div id="game-container" style="display: none;">
+		<h2 id="player-heading"></h2>
+		<h3>Season Stats</h3>
+		<p>Team Record: <span id="team-record">0-0</span></p>
+		<p>Player Stats: <span id="player-stats">0 PTS, 0 REB, 0 AST</span></p>
+		<p>Salary: $<span id="salary">0</span></p>
+		<button id="simulate-game">Simulate Game</button>
+	</div>
+	<div id="career-stats" style="display: none;">
+		<h3>Career Stats</h3>
+		<table>
+			<tr>
+				<th>Season</th>
+				<th>Team Record</th>
+				<th>Player Stats</th>
+				<th>Salary</th>
+			</tr>
+		</table>
+	</div>
+	<script>
+		var careerStats = [];
+		var currentSeason = 1;
+		var totalWins = 0;
+		
+		$(document).ready(function() {
+			$("#player-form").submit(function(event) {
+				event.preventDefault();
+				var playerName = $("#player-name").val();
+				var draftPosition = $("#draft-position").val();
+				var teams = ["Atlanta Hawks", "Boston Celtics", "Brooklyn Nets", "Charlotte Hornets", "Chicago Bulls", "Cleveland Cavaliers", "Dallas Mavericks", "Denver Nuggets", "Detroit Pistons", "Golden State Warriors", "Houston Rockets", "Indiana Pacers", "LA Clippers", "Los Angeles Lakers", "Memphis Grizzlies", "Miami Heat", "Milwaukee Bucks", "Minnesota Timberwolves", "New Orleans Pelicans", "New York Knicks", "Oklahoma City Thunder", "Orlando Magic", "Philadelphia 76ers", "Phoenix Suns", "Portland Trail Blazers", "Sacramento Kings", "San Antonio Spurs", "Toronto Raptors", "Utah Jazz", "Washington Wizards"];
+                var teamIndex = Math.floor(Math.random() * teams.length);
+                var teamName = teams[teamIndex];
+                $("#player-heading").text(playerName + " - " + teamName);
+				$("#game-container").show();
+				$("#player-form").hide();
+				$("#team-record").text("0-0");
+				$("#player-stats").text("0 PTS, 0 REB, 0 AST");
+				$("#salary").text("0");
+				var gamesPlayed = 0;
+				var seasonWins = 0;
+				var seasonLosses = 0;
+				$("#simulate-game").click(function() {
+					var playerPoints = Math.floor(Math.random() * 50);
+					var playerRebounds = Math.floor(Math.random() * 15);
+					var playerAssists = Math.floor(Math.random() * 15);
+					var gameDifficulty = Math.floor(Math.random() * 15) + 5; // Make games easier or harder depending on the player's stats
+					if (playerPoints >= gameDifficulty && playerRebounds >= gameDifficulty && playerAssists >= gameDifficulty) {
+						var gameResult = "W";
+						seasonWins++;
+						totalWins++;
+					} else {
+						var gameResult = "L";
+						seasonLosses++;
+					}
+					$("#team-record").text(seasonWins + "-" + seasonLosses);
+					$("#player-stats").text(playerPoints + " PTS, " + playerRebounds + " REB, " + playerAssists + " AST");
+					var salary = parseInt($("#salary").text()) + (gameResult == "W" ? 100000 : 50000);
+					$("#salary").text(salary);
+					gamesPlayed++;
+					if (gamesPlayed >= 82) {
+						if (seasonWins > 2) {
+							$("#player-heading").append(" - Champion!"); // Indicate the player as having won a championship
+						}
+						careerStats.push({
+							"season": currentSeason,
+							"teamRecord": seasonWins + "-" + seasonLosses,
+							"playerStats": playerPoints + " PTS, " + playerRebounds + " REB, " + playerAssists + " AST",
+							"salary": salary
+						});
+						$("#career-stats table").append("<tr><td>" + currentSeason + "</td><td>" + careerStats[currentSeason-1].teamRecord + "</td><td>" + careerStats[currentSeason-1].playerStats + "</td><td>" + careerStats[currentSeason-1].salary + "</td></tr>");
+						currentSeason++;
+						seasonWins = 0;
+						seasonLosses = 0;
+						$("#team-record").text("0-0");
+						$("#player-stats").text("0 PTS, 0 REB, 0 AST");
+						$("#salary").text("0");
+						gamesPlayed = 0;
+						if (currentSeason > 10) {
+							alert("Career Over! Click OK to see your stats.");
+							$("#game-container").hide();
+							$("#career-stats").show();
+						} else {
+							alert("Season Over! Click OK to start a new season.");
+							$("#player-heading").text(playerName + " - " + teamName); // Show the player and team name again
+						}
+					}
+				});
+			});
+		});
+	</script>
+</body>
+</html>
